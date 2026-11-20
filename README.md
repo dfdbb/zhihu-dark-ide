@@ -2,6 +2,9 @@
 
 把知乎重绘成你天天打交道的暗色 IDE：左边活动栏和文件树，上面标签页和面包屑，右下角 minimap 和状态栏，回答按代码编辑器排版。不改变知乎的任何内容，只换一层皮。
 
+- GitHub：[dfdbb/zhihu-dark-ide](https://github.com/dfdbb/zhihu-dark-ide)
+- Gitee 镜像（国内访问更快）：[youngforguo/zhihu-dark-ide](https://gitee.com/youngforguo/zhihu-dark-ide)
+
 ![首页热榜](docs/screenshots/hot.png)
 
 ![回答页](docs/screenshots/article.png)
