@@ -7,6 +7,8 @@
 
 ![首页热榜](docs/screenshots/hot.png)
 
+![亮色主题](docs/screenshots/light.png)
+
 ![回答页](docs/screenshots/article.png)
 
 ## 它长什么样
@@ -18,6 +20,7 @@
   - 分栏：右侧一条变更审阅（diff），用 `+/-` 标出观点、数据和引用。
 - **悬浮搜索**：鼠标靠近标签栏右上角，搜索框滑出；也可以直接 `Ctrl + K`。搜索结果会被拆成一行行「文件」，点开就是正文。
 - **专注模式**：隐藏顶部站内导航和右侧推荐、广告，只留内容。
+- **亮 / 暗两套配色**：默认暗色；`Ctrl + Shift + L`、点活动栏月亮图标或状态栏「主题」即可切到亮色。亮色是浅灰外壳 + 纯白正文，白天和投屏时更舒服，选择会记在本地。
 - **老板键**：一键还原成原版知乎，再按一次回来。
 
 ![搜索结果](docs/screenshots/search.png)
@@ -51,6 +54,7 @@
 | 搜索 | `Ctrl + K` 或 `Ctrl + Shift + F` |
 | 老板键（还原原版页面） | `Ctrl + Shift + H` 或 `Ctrl + Shift + Q` |
 | 专注模式 | `Ctrl + Shift + B` |
+| 亮色 / 暗色主题 | `Ctrl + Shift + L` |
 | 融合 / 分栏切换 | `Ctrl + Shift + M` / `Ctrl + Shift + G` |
 
 手机上不适用，只面向桌面浏览器。皮肤可以随时关掉，开关会记在本地。
@@ -59,7 +63,7 @@
 
 - 所有代码都在你的浏览器里本地运行，**不发起任何网络请求**，**不采集任何数据**。
 - 不申请任何扩展权限（`permissions` 为空），只通过内容脚本改样式。
-- 浏览器里只存四个开关状态（`zhihu-ide:*`），删掉扩展即清除。
+- 浏览器里只存五个开关状态（`zhihu-ide:*`），删掉扩展即清除。
 
 ## 已知限制
 
@@ -101,6 +105,6 @@ node tools/build-userscript.mjs
 
 ## English
 
-A Chrome/Edge extension and Tampermonkey userscript that re-skins zhihu.com as a dark IDE: activity bar, file explorer, tabs, minimap, status bar, and article bodies typeset like source code. Everything runs locally — no network requests, no data collection, no extension permissions.
+A Chrome/Edge extension and Tampermonkey userscript that re-skins zhihu.com as a dark IDE: activity bar, file explorer, tabs, minimap, status bar, and article bodies typeset like source code. A light palette is one shortcut away (`Ctrl + Shift + L`). Everything runs locally — no network requests, no data collection, no extension permissions.
 
 Install: clone the repo, open `chrome://extensions`, enable Developer mode, click "Load unpacked" and pick the repo root. Or install `dist/zhihu-ide.user.js` with Tampermonkey.

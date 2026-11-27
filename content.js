@@ -13,6 +13,7 @@
   const KEY_CLEAN = 'zhihu-ide:clean';
   const KEY_REVIEW = 'zhihu-ide:review';
   const KEY_FUSE = 'zhihu-ide:fuse';
+  const KEY_THEME = 'zhihu-ide:theme';
   const PREF = {
     mono: '"JetBrains Mono","Cascadia Mono",Consolas,"SF Mono",Menlo,"Microsoft YaHei",monospace',
     ui: '"Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif',
@@ -28,6 +29,9 @@
   // 融合模式：不用侧栏，代码单元直接插进正文流（与分栏互斥）
   let fuse = true;
   try { fuse = localStorage.getItem(KEY_FUSE) !== '0'; } catch (e) {}
+  // 主题：dark（默认）/ light，只切换配色令牌，版式完全一致
+  let theme = 'dark';
+  try { theme = localStorage.getItem(KEY_THEME) === 'light' ? 'light' : 'dark'; } catch (e) {}
 
   const $ = (s, r) => (r || document).querySelector(s);
 
@@ -36,6 +40,7 @@
     const de = document.documentElement;
     if (de && enabled) {
       de.classList.add('zide');
+      if (theme === 'light') de.classList.add('zide-light');
       if (clean) de.classList.add('zide-clean');
       if (review) de.classList.add('zide-rv');
       if (fuse) de.classList.add('zide-fuse');
@@ -85,8 +90,66 @@
   /* 审阅栏专用行号灰：比正文左侧的注释号（--z-gutter）更亮，5.73:1，扫读时不会糊成一片 */
   --z-rv-gutter:#8a9099;
   --z-rv-code:#e8e8e8;      /* 审阅栏的代码正文（比文章正文更亮一档，衬托「这是代码」） */
+  /* ---- 以下令牌由原先写死的颜色抽出，亮色主题只覆盖这一组即可 ---- */
+  --z-on-accent:#ffffff;     /* 强调色块上的文字 */
+  --z-accent-line:#d4d4d4;   /* 活动栏当前项指示条 */
+  --z-act:#868686;           /* 未激活的活动栏图标 */
+  --z-sel-bg:#2e4358; --z-sel-fg:#e9e9e9;
+  --z-hair:#ffffff14; --z-hair-2:#ffffff12; --z-hair-3:#ffffff18;
+  --z-hair-4:#ffffff0a; --z-hair-5:#ffffff09;
+  --z-sb-hover:#ffffff1f; --z-sb-brand:#ffffff14;
+  --z-shadow:#000000b8;
+  --z-map-txt:#5a5a5a;
+  --z-cell-file:#a8c6e0; --z-cell-tag:#9dc0dd; --z-cell-tag-bg:#2a3a49;
+  --z-add-bg:#3fb9501f; --z-del-bg:#f851491f; --z-del-fg:#b9b9b9;
+  --z-hunk:#ffffff12; --z-hunk-fg:#9ec7ea;
+  --z-cur-gutter:#d2d6db;
+  --z-gutter-line:#ffffff12;
+  --z-link-dash:#4daafc66;
   --z-mono:${PREF.mono};
   --z-ui:${PREF.ui};
+}
+
+/* ---------- 亮色主题 ----------
+   同一套令牌的另一组取值：外壳浅灰、内容区纯白（内容「凸」起），
+   语义色换成 Light+ 那套高对比取值。切换只改 <html> 上的类，不动布局。 */
+html.zide.zide-light{
+  color-scheme:light;
+  --z-bg-0:#f3f3f3;
+  --z-bg-1:#ffffff;
+  --z-bg-2:#ffffff;
+  --z-bg-3:#f0f0f0;
+  --z-code:#f7f7f7;
+  --z-hover:#ececec;
+  --z-sel:#dbe7f5;
+  --z-line:#e4e4e4; --z-line-2:#cdcdcd;
+  --z-fg:#333333;
+  --z-fg-hi:#1b1b1b;
+  --z-fg-dim:#5f5f5f;
+  --z-fg-mute:#8a8a8a;
+  --z-gutter:#9a9a9a;
+  --z-blue:#0066bf; --z-link:#0b5cad;
+  --z-btn:#0066bf; --z-btn-hi:#0056a5; --z-btn-fg:#ffffff;
+  --z-comment:#008000; --z-string:#a31515; --z-keyword:#0000ff; --z-ctrl:#af00db;
+  --z-func:#795e26; --z-var:#001080; --z-type:#267f99; --z-num:#098658; --z-const:#0070c1;
+  --z-yellow:#8a6d00; --z-green:#1a7f37; --z-red:#cf222e;
+  --z-rv-gutter:#a0a0a0;
+  --z-rv-code:#1b1b1b;
+  --z-on-accent:#ffffff;
+  --z-accent-line:#0066bf;
+  --z-act:#767676;
+  --z-sel-bg:#cfe3fb; --z-sel-fg:#12263a;
+  --z-hair:#00000010; --z-hair-2:#0000000f; --z-hair-3:#0000001a;
+  --z-hair-4:#00000008; --z-hair-5:#0000000d;
+  --z-sb-hover:#00000012; --z-sb-brand:#00000008;
+  --z-shadow:#0000002e;
+  --z-map-txt:#c9c9c9;
+  --z-cell-file:#0b5cad; --z-cell-tag:#0b5cad; --z-cell-tag-bg:#dbeafe;
+  --z-add-bg:#1a7f3714; --z-del-bg:#cf222e14; --z-del-fg:#6e6e6e;
+  --z-hunk:#00000008; --z-hunk-fg:#0b5cad;
+  --z-cur-gutter:#5f5f5f;
+  --z-gutter-line:#00000012;
+  --z-link-dash:#0b5cad66;
 }
 
 /* ---------- 排版与底色 ---------- */
@@ -97,7 +160,7 @@ html.zide body{
   font-family:var(--z-ui)!important;
   -webkit-font-smoothing:antialiased;
 }
-html.zide ::selection{ background:#2e4358!important; color:#e9e9e9!important; }
+html.zide ::selection{ background:var(--z-sel-bg)!important; color:var(--z-sel-fg)!important; }
 html.zide ::-webkit-scrollbar{ width:12px; height:12px; }
 html.zide ::-webkit-scrollbar-track{ background:transparent; }
 html.zide ::-webkit-scrollbar-thumb{ background:#4e4e4e; border:3px solid transparent; background-clip:content-box; border-radius:6px; }
@@ -257,7 +320,7 @@ html.zide .AppHeader-Tabs a,
 html.zide .AppHeader-nav a,
 html.zide .AppHeader-Tab{ color:var(--z-fg-dim)!important; font-size:13px!important; }
 html.zide .AppHeader-Tabs a:hover,
-html.zide .AppHeader-nav a:hover{ color:#fff!important; }
+html.zide .AppHeader-nav a:hover{ color:var(--z-fg-hi)!important; }
 /* 隐藏知乎品牌标识，换成工程标识 */
 html.zide .AppHeader-Logo img,
 html.zide .AppHeader-Logo svg{ display:none!important; }
@@ -336,7 +399,7 @@ html.zide.zide-clean .Question-mainColumn{
   display:flex; align-items:center; gap:7px;
   background:var(--z-bg-2); border:1px solid var(--z-line-2); border-top:0;
   border-radius:0 0 6px 6px;
-  padding:7px 8px 8px; box-shadow:0 10px 26px #000000b8;
+  padding:7px 8px 8px; box-shadow:0 10px 26px var(--z-shadow);
   opacity:0; transform:translateY(-10px); pointer-events:none;
   transition:opacity .15s ease, transform .15s ease;
 }
@@ -409,12 +472,12 @@ html.zide .RichText blockquote{
   font-style:italic;
 }
 html.zide .RichText blockquote *{ color:var(--z-fg-dim)!important; }
-html.zide .RichText a{ color:var(--z-link)!important; text-decoration:none!important; border-bottom:1px dashed #4daafc66!important; }
+html.zide .RichText a{ color:var(--z-link)!important; text-decoration:none!important; border-bottom:1px dashed var(--z-link-dash)!important; }
 html.zide .RichText a:hover{ border-bottom-style:solid!important; }
 html.zide .RichText strong{ color:var(--z-fg-hi)!important; font-weight:600!important; }
 html.zide .RichText em{ color:var(--z-string)!important; font-style:italic!important; }
 html.zide .RichText code{
-  background:#ffffff14!important;
+  background:var(--z-hair)!important;
   border:0!important;
   border-radius:3px!important;
   color:var(--z-fg)!important;
@@ -519,7 +582,7 @@ html.zide .QuestionHeader-title::before{
 html.zide .Tab, html.zide .Tabs-item, html.zide .Tabs{ background:transparent!important; color:var(--z-fg-dim)!important; }
 html.zide .Tabs-item.is-active{ color:var(--z-fg)!important; }
 html.zide .Tabs-item--active, html.zide .Tabs-item.active{
-  color:#fff!important; border-bottom:1px solid var(--z-fg)!important; background:transparent!important;
+  color:var(--z-fg-hi)!important; border-bottom:1px solid var(--z-fg)!important; background:transparent!important;
 }
 html.zide .HotItem, html.zide .HotList-item{ background:var(--z-bg-1)!important; border-bottom:1px solid var(--z-line)!important; }
 html.zide .NumberBoard-itemValue, html.zide .NumberBoard-item{ color:var(--z-fg)!important; background:transparent!important; }
@@ -708,14 +771,14 @@ html.zide .QuestionHeader-status{
 }
 .zide-act{
   width:48px; height:48px; display:flex; align-items:center; justify-content:center;
-  color:#868686; position:relative; cursor:pointer;
+  color:var(--z-act); position:relative; cursor:pointer;
 }
 .zide-act:hover{ color:var(--z-fg); }
 .zide-act.zide-on{ color:var(--z-fg-hi); }
-.zide-act.zide-on::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:2px; background:#d4d4d4; }
+.zide-act.zide-on::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--z-accent-line); }
 .zide-act svg{ width:23px; height:23px; }
 .zide-act .zide-badge{
-  position:absolute; right:9px; bottom:10px; background:var(--z-blue); color:#fff;
+  position:absolute; right:9px; bottom:10px; background:var(--z-blue); color:var(--z-on-accent);
   font-size:9px; line-height:12px; padding:0 4px; border-radius:8px;
 }
 .zide-grow{ flex:1; }
@@ -769,33 +832,33 @@ html.zide .QuestionHeader-status{
   font-family:var(--z-ui); cursor:default;
 }
 .zide-tab .zide-tn{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.zide-tab.zide-on{ background:var(--z-bg-1); color:#fff; }
+.zide-tab.zide-on{ background:var(--z-bg-1); color:var(--z-fg-hi); }
 .zide-tab.zide-on::before{ content:""; position:absolute; left:0; right:0; top:0; height:1px; background:var(--z-link); }
 .zide-tab .zide-dot{ width:7px; height:7px; border-radius:50%; background:var(--z-fg-dim); flex:0 0 auto; }
 .zide-tab .zide-x{ margin-left:auto; opacity:.55; font-size:14px; line-height:1; }
 
 .zide-map{
-  right:0; top:34px; bottom:22px; width:78px; border-left:1px solid #ffffff0a;
+  right:0; top:34px; bottom:22px; width:78px; border-left:1px solid var(--z-hair-4);
   overflow:hidden; cursor:pointer;
 }
 .zide-map-inner{ position:absolute; left:6px; right:26px; top:0; }
-.zide-ml{ height:2px; margin-bottom:1px; border-radius:1px; background:#5a5a5a; opacity:.75; }
-.zide-ml.k{ background:#569cd6; } .zide-ml.s{ background:#ce9178; }
-.zide-ml.c{ background:#6a9955; } .zide-ml.t{ background:#4ec9b0; }
-.zide-ml.f{ background:#dcdcaa; }
-.zide-map .zide-slider{ position:absolute; right:0; top:0; bottom:0; width:22px; background:var(--z-bg-1); border-left:1px solid #ffffff08; }
+.zide-ml{ height:2px; margin-bottom:1px; border-radius:1px; background:var(--z-map-txt); opacity:.75; }
+.zide-ml.k{ background:var(--z-keyword); } .zide-ml.s{ background:var(--z-string); }
+.zide-ml.c{ background:var(--z-comment); } .zide-ml.t{ background:var(--z-type); }
+.zide-ml.f{ background:var(--z-func); }
+.zide-map .zide-slider{ position:absolute; right:0; top:0; bottom:0; width:22px; background:var(--z-bg-1); border-left:1px solid var(--z-hair-5); }
 .zide-vp{
-  position:absolute; left:0; right:0; background:#ffffff18; pointer-events:none;
-  border-top:1px solid #ffffff14; border-bottom:1px solid #ffffff14;
+  position:absolute; left:0; right:0; background:var(--z-hair-3); pointer-events:none;
+  border-top:1px solid var(--z-hair); border-bottom:1px solid var(--z-hair);
 }
 
 .zide-status{
   left:0; right:0; bottom:0; height:22px; display:flex; align-items:center;
-  font-size:12px; color:#fff; padding:0 2px; gap:0;
+  font-size:12px; color:var(--z-fg); padding:0 2px; gap:0;
 }
 .zide-sb{ display:flex; align-items:center; gap:4px; padding:0 7px; height:22px; border-radius:3px; cursor:default; white-space:nowrap; }
-.zide-sb:hover{ background:#ffffff1f; }
-.zide-sb.zide-brand{ background:#ffffff14; }
+.zide-sb:hover{ background:var(--z-sb-hover); }
+.zide-sb.zide-brand{ background:var(--z-sb-brand); }
 .zide-sb.zide-mono{ font-family:var(--z-mono); font-size:11px; }
 .zide-sb.zide-push{ margin-left:auto; }
 .zide-sb svg{ width:13px; height:13px; }
@@ -846,7 +909,7 @@ html.zide.zide-rv .QuestionHeader{
   background:var(--z-bg-1);
   border-left:1px solid #3b3e43;
   /* 从正文里「浮」出来：一层向内的投影把审阅栏和文章切开，扫读时不会串行 */
-  box-shadow:-12px 0 28px -8px #000000b8;
+  box-shadow:-12px 0 28px -8px var(--z-shadow);
   font-family:var(--z-mono); font-size:12px;
   overflow:hidden;
 }
@@ -878,7 +941,7 @@ html.zide.zide-rv .zide-review{ display:flex; }
 .zide-rl-no{
   flex:0 0 34px; text-align:right; padding-right:8px;
   color:var(--z-rv-gutter)!important; user-select:none;
-  box-shadow:inset -1px 0 0 #ffffff12;   /* 行号与代码之间的分隔，像真编辑器的 gutter */
+  box-shadow:inset -1px 0 0 var(--z-gutter-line);   /* 行号与代码之间的分隔，像真编辑器的 gutter */
 }
 .zide-rl-mk{ flex:0 0 13px; color:var(--z-fg-mute)!important; font-weight:700; }
 .zide-rl-tx{ flex:1; min-width:0; overflow:hidden; color:var(--z-rv-code); }
@@ -891,20 +954,20 @@ html.zide.zide-rv .zide-review{ display:flex; }
 .zide-rl-tx i.n{ color:var(--z-num); }
 .zide-rl-tx i.v{ color:var(--z-var); }
 .zide-rl.ctx .zide-rl-tx{ color:var(--z-rv-code); }
-.zide-rl.add{ background:#3fb9501f; }
+.zide-rl.add{ background:var(--z-add-bg); }
 .zide-rl.add .zide-rl-mk{ color:var(--z-green)!important; }
-.zide-rl.del{ background:#f851491f; }
-.zide-rl.del .zide-rl-tx{ color:#b9b9b9; }
+.zide-rl.del{ background:var(--z-del-bg); }
+.zide-rl.del .zide-rl-tx{ color:var(--z-del-fg); }
 .zide-rl.del .zide-rl-mk{ color:var(--z-red)!important; }
-.zide-rl.hunk{ background:#ffffff12; color:#9ec7ea!important; font-weight:600; }
+.zide-rl.hunk{ background:var(--z-hunk); color:var(--z-hunk-fg)!important; font-weight:600; }
 .zide-rl.hunk .zide-rl-no{ color:transparent!important; box-shadow:none; }
 .zide-rl.cur{
   /* 用 background-image 叠加，而不是覆盖 background-color ——
      否则「当前行」会把 add/del 的红绿整条吃掉（旧版就是这个毛病） */
-  background-image:linear-gradient(#ffffff14,#ffffff14);
+  background-image:linear-gradient(var(--z-hair),var(--z-hair));
   box-shadow:inset 2px 0 0 var(--z-keyword);
 }
-.zide-rl.cur .zide-rl-no{ color:#d2d6db!important; }
+.zide-rl.cur .zide-rl-no{ color:var(--z-cur-gutter)!important; }
 
 /* ---------- 融合模式：代码单元直接插进正文流 ----------
    两种版式互斥：分栏（右侧固定 diff 栏）↔ 融合（代码跟着段落走）。
@@ -939,19 +1002,19 @@ html.zide.zide-fuse .QuestionHeader{
 }
 .zide-cell-head{
   display:flex; align-items:center; gap:8px; height:24px; padding:0 9px;
-  background:#1d1e1f; border-bottom:1px solid var(--z-line);
+  background:var(--z-bg-2); border-bottom:1px solid var(--z-line);
   color:var(--z-fg-mute); font-size:11px; white-space:nowrap; overflow:hidden;
 }
-.zide-cell-head .zide-cell-file{ color:#a8c6e0; overflow:hidden; text-overflow:ellipsis; }
+.zide-cell-head .zide-cell-file{ color:var(--z-cell-file); overflow:hidden; text-overflow:ellipsis; }
 .zide-cell-head .zide-cell-rg{ color:var(--z-fg-mute); }
 .zide-cell-head .zide-cell-tag{
   margin-left:auto; flex:0 0 auto; padding:0 5px; border-radius:2px;
-  background:#2a3a49; color:#9dc0dd;
+  background:var(--z-cell-tag-bg); color:var(--z-cell-tag);
 }
 .zide-cell-body{ padding:6px 0 8px; }
 /* 单元里的行复用审阅栏的行样式，但不要 +/- 标记列 */
 .zide-cell .zide-rl-mk{ display:none; }
-.zide-cell .zide-rl:hover{ background:#ffffff0a; }
+.zide-cell .zide-rl:hover{ background:var(--z-hair-4); }
 /* ⚠ 正文里有一条 html.zide .RichText * { color: !important } 的通配规则，
    而融合单元就插在 .RichText 内部 —— 语法色会被它整片压平成正文灰。
    这里用更高的特异度（0,4,2 > 0,2,1）顶回来，否则代码会变成一坨白色。 */
@@ -966,8 +1029,8 @@ html.zide .zide-cell .zide-rl-tx i.n{ color:var(--z-num)!important; }
 html.zide .zide-cell .zide-rl-tx i.v{ color:var(--z-var)!important; }
 html.zide .zide-cell .zide-cell-head,
 html.zide .zide-cell .zide-cell-head span{ color:var(--z-fg-mute)!important; }
-html.zide .zide-cell .zide-cell-head .zide-cell-file{ color:#a8c6e0!important; }
-html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
+html.zide .zide-cell .zide-cell-head .zide-cell-file{ color:var(--z-cell-file)!important; }
+html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:var(--z-cell-tag)!important; }
 
 /* 超宽屏（用户的屏是 2560）：正文列跟着长一点，否则两侧空白会明显到像「坏了」。
    上限压在 860px —— 13px 中文一行约 48 字，再宽就开始串行 */
@@ -1034,6 +1097,8 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
     debug: svg('<path d="M5 3l14 9-14 9z"/><circle cx="18" cy="5" r="2"/>'),
     ext: svg('<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><path d="M17 13v8M13 17h8"/>'),
     power: svg('<path d="M12 3v9"/><path d="M6.8 6.5a8 8 0 1 0 10.4 0"/>', 1.6),
+    sun: svg('<circle cx="8" cy="8" r="3.2"/><path d="M8 1.4v2M8 12.6v2M1.4 8h2M12.6 8h2M3.3 3.3l1.4 1.4M11.3 11.3l1.4 1.4M3.3 12.7l1.4-1.4M11.3 4.7l1.4-1.4"/>', 1.3),
+    moon: svg('<path d="M13.6 9.8A6 6 0 0 1 6.2 2.4a6 6 0 1 0 7.4 7.4z"/>', 1.4),
     file: '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#519aba" stroke-width="1.3"><path d="M9 1.6H4.2A1.2 1.2 0 0 0 3 2.8v10.4A1.2 1.2 0 0 0 4.2 14.4h7.6A1.2 1.2 0 0 0 13 13.2V5.6z"/><path d="M9 1.6v4h4"/></svg>',
     json: '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#cbcb41" stroke-width="1.3"><path d="M9 1.6H4.2A1.2 1.2 0 0 0 3 2.8v10.4A1.2 1.2 0 0 0 4.2 14.4h7.6A1.2 1.2 0 0 0 13 13.2V5.6z"/><path d="M9 1.6v4h4"/></svg>',
     dir: '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="#dcb67a" stroke-width="1.3"><path d="M1.8 12.6V3.8A1 1 0 0 1 2.8 2.8h3.4l1.4 1.7h5.6a1 1 0 0 1 1 1v7.1a1 1 0 0 1-1 1H2.8a1 1 0 0 1-1-1z"/></svg>',
@@ -1078,6 +1143,7 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
         <div class="zide-act" title="运行和调试 (Ctrl+Shift+D)">${ICON.debug}</div>
         <div class="zide-act" title="扩展 (Ctrl+Shift+X)">${ICON.ext}</div>
         <div class="zide-grow"></div>
+        <div class="zide-act zide-toggle" id="zideTheme" title="亮色 / 暗色主题 (Ctrl+Shift+L)">${ICON.moon}</div>
         <div class="zide-act zide-toggle" id="zideToggle" title="切换 IDE 皮肤 (Ctrl+\`)">${ICON.power}</div>
       </div>
 
@@ -1129,6 +1195,7 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
       window.scrollTo({ top: Math.max(0, ratio * max), behavior: 'auto' });
     });
     $('#zideToggle').addEventListener('click', () => setEnabled(!enabled));
+    $('#zideTheme').addEventListener('click', () => setTheme(theme === 'light' ? 'dark' : 'light'));
     const actSearch = $('#zideActSearch');
     if (actSearch) actSearch.addEventListener('click', function () { toggleFind(true); });
     const actGit = $('#zideActGit');
@@ -1258,12 +1325,15 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
       + '<div class="zide-sb zide-mono" title="语言模式">{ } ' + cur.lang + '</div>'
       + '<div class="zide-sb" title="Prettier 已启用">' + ICON.check + '</div>'
       + '<div class="zide-sb" title="通知">' + ICON.bell + '</div>'
+      + '<div class="zide-sb zide-mono zide-toggle" id="zideThemeChip" title="亮色 / 暗色主题 (Ctrl+Shift+L)">主题:' + (theme === 'light' ? '亮' : '暗') + '</div>'
       + '<div class="zide-sb zide-mono zide-toggle" id="zideFuse" title="融合模式：代码单元插进正文流 (Ctrl+Shift+M)">融合:' + (fuse ? 'on' : 'off') + '</div>'
       + '<div class="zide-sb zide-mono zide-toggle" id="zideRv" title="变更审阅分栏：右侧 diff (Ctrl+Shift+G)">审阅:' + (review ? 'on' : 'off') + '</div>'
       + '<div class="zide-sb zide-mono zide-toggle" id="zideClean" title="专注模式：隐藏顶部导航与右侧推荐/广告栏 (Ctrl+Shift+B)">专注:' + (clean ? 'on' : 'off') + '</div>'
       + '<div class="zide-sb zide-mono zide-toggle" id="zideOff" title="切换 IDE 皮肤 (Ctrl+&#96;)">zhihu-web</div>';
     const cleanEl = $('#zideClean');
     if (cleanEl) cleanEl.addEventListener('click', () => setClean(!clean));
+    const themeEl = $('#zideThemeChip');
+    if (themeEl) themeEl.addEventListener('click', () => setTheme(theme === 'light' ? 'dark' : 'light'));
     const fuseEl = $('#zideFuse');
     if (fuseEl) fuseEl.addEventListener('click', () => setFuse(!fuse));
     const rvEl = $('#zideRv');
@@ -1288,6 +1358,23 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
     document.documentElement.classList.toggle('zide-fuse', !!(enabled && fuse));
     const el = $('#zideFuse');
     if (el) el.textContent = '融合:' + (fuse ? 'on' : 'off');
+  }
+
+  function applyTheme() {
+    const light = !!(enabled && theme === 'light');
+    document.documentElement.classList.toggle('zide-light', light);
+    const act = $('#zideTheme');
+    if (act) act.innerHTML = light ? ICON.sun : ICON.moon;
+    const chip = $('#zideThemeChip');
+    if (chip) chip.textContent = '主题:' + (light ? '亮' : '暗');
+  }
+
+  function setTheme(next) {
+    theme = next === 'light' ? 'light' : 'dark';
+    try { localStorage.setItem(KEY_THEME, theme); } catch (e) {}
+    applyTheme();
+    // minimap 与正文行号的颜色来自令牌，重绘一次避免停留在旧主题
+    try { renderMap(); } catch (e) {}
   }
 
   function setReview(next) {
@@ -2474,6 +2561,7 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
     applyClean();
     applyReview();
     applyFuse();
+    applyTheme();
     if (!enabled) { clearSurfaceFixes(); clearFlatSurfaces(); clearSideColumns(); clearAnno(); reviewSig = ''; }
     // 融合单元是往正文里插的节点，关皮肤必须整批摘掉，页面才真的恢复原样
     if (!enabled) clearFusion();
@@ -2507,6 +2595,7 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
       if (ctrl && e.shiftKey && (e.key === 'F' || e.key === 'f')) { e.preventDefault(); toggleFind(true); return; }
       if (ctrl && e.shiftKey && (e.key === 'G' || e.key === 'g')) { e.preventDefault(); if (fuse) setFuse(false); else setReview(!review); return; }
       if (ctrl && e.shiftKey && (e.key === 'M' || e.key === 'm')) { e.preventDefault(); setFuse(!fuse); return; }
+      if (ctrl && e.shiftKey && (e.key === 'L' || e.key === 'l')) { e.preventDefault(); setTheme(theme === 'light' ? 'dark' : 'light'); return; }
       if (e.key === 'Escape') { toggleFind(false); return; }
     }, true);
     window.addEventListener('scroll', function () { updatePos(); syncMap(); syncReview(); }, { passive: true });
@@ -2526,6 +2615,7 @@ html.zide .zide-cell .zide-cell-head .zide-cell-tag{ color:#9dc0dd!important; }
     applyClean();
     applyReview();
     applyFuse();
+    applyTheme();
     refresh(true);
     hookRouting();
     watchUrl();
